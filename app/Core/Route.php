@@ -2,57 +2,76 @@
 
 namespace App\Core;
 
-class Route {
-    private $namespace = "App\Controllers\\";
-    private $controller;
-    private $action;
-    private $params;
+class Route
+{
+    private string $namespace = "App\Controllers\\";
+    private object|string $controller;
+    private string $action;
+    private array $params;
 
-    static private $resources = [];
+    static private array $resources = [];
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->useRoute();
     }
 
-    private function useRoute() : void {
+    private function useRoute()
+    {
         $url = empty($_GET["url"]) ? "" : trim($_GET["url"], "/");
 
-        foreach (self::$resources as $route => $action)
+        foreach (self::$resources as $route => $action) {
             if ($this->validateRoute($url, $route)) {
                 $params = $this->getRouteParams($url, $route);
-                if ($this->execRoute($action, $params)) return;
+                if ($this->execRoute($action, $params)) {
+                    return;
+                }
             }
-        throw new \App\Exceptions\RouteException("Route not found.");
+        }
+
+        throw new \Exception("Route not found.");
     }
 
-    private function validateRoute(string $url, string $route) : bool {
+    private function validateRoute(string $url, string $route): bool
+    {
         $pattern = "/^" . str_replace(["{}", "/"], ["\w+", "\/"], $route) . "$/";
+
         return preg_match($pattern, $url);
     }
 
-    private function getRouteParams(string $url, string $route) : array {
+    private function getRouteParams(string $url, string $route): array
+    {
         $params = [];
         $urlPieces = explode("/", $url);
         $routePieces = explode("/", $route);
-        for ($p = 0; $p < count($routePieces); $p++)
-            if ($routePieces[$p] == "{}") $params[] = $urlPieces[$p];
+        for ($p = 0; $p < count($routePieces); $p++) {
+            if ($routePieces[$p] == "{}") {
+                $params[] = $urlPieces[$p];
+            }
+        }
+
         return $params;
     }
 
-    private function execRoute($action, array $params) : bool {
+    private function execRoute($action, array $params): bool
+    {
         if (gettype($action) == "string") {
             $actionPieces = explode("@", $action);
 
-            $this->controller  = $actionPieces[0];
-            $this->action      = $actionPieces[1];
-            $this->params      = $params;
+            $this->controller = $actionPieces[0];
+            $this->action = $actionPieces[1];
+            $this->params = $params;
 
             return $this->execController();
-        } else $action(...$params);
+        } else {
+            $action(...$params);
+        }
+
         return true;
     }
 
-    private function execController() : bool {
+    private function execController(): bool
+    {
         $controller = $this->namespace . $this->controller;
         if (class_exists($controller)) {
             $this->controller = new $controller;
@@ -61,9 +80,12 @@ class Route {
                 return true;
             }
         }
+
+        return false;
     }
 
-    static public function setRoute(string $route, $action) : void {
+    static public function setRoute(string $route, $action)
+    {
         self::$resources[trim($route, "/")] = $action;
     }
 }
