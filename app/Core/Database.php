@@ -2,21 +2,24 @@
 
 namespace App\Core;
 
-class Database {
-    private $host      = "localhost";
-    private $dbName    = "skeleton";
-    private $username  = "username";
-    private $password  = "password";
+class Database
+{
+    private string $host = "localhost";
+    private string $dbName = "skeleton";
+    private string $username = "username";
+    private string $password = "password";
 
-    private $conn;
+    private \PDO $connection;
 
-    public function __construct() {
+    public function __construct()
+    {
         $this->connect();
     }
 
-    private function connect() : void {
+    private function connect()
+    {
         try {
-            $this->conn = new \PDO(
+            $this->connection = new \PDO(
                 "mysql:host=".$this->host.";dbname=".$this->dbName,
                 $this->username,
                 $this->password
@@ -27,17 +30,23 @@ class Database {
         }
     }
 
-    public function query(string $query, array $params=[]) {
-        $sth = $this->conn->prepare($query);
+    public function query(string $query, array $params=[])
+    {
+        $sth = $this->connection->prepare($query);
         $sth->execute($params);
 
-        if (preg_match("/^SELECT\b/i", $query)) return $sth->fetchAll();
+        if (preg_match("/^SELECT\b/i", $query)) {
+            return $sth->fetchAll();
+        }
     }
 
-    public function recordAdd(string $table, array $attrs) : void {
-        $columnsStr = ""; $columnsTemp = "";
+    public function recordAdd(string $table, array $attrs)
+    {
+        $columnsStr = "";
+        $columnsTemp = "";
         foreach ($attrs as $column => $value) {
-        	$columnsStr .= ",$column"; $columnsTemp .= ",?";
+        	$columnsStr .= ",$column";
+            $columnsTemp .= ",?";
         	$values[] = $value;
         }
         $columnsStr = trim($columnsStr, ",");
@@ -47,15 +56,18 @@ class Database {
         $this->query($query, $values);
     }
 
-    public function recordsDelete(string $table, string $idColumn, $idValue) : void {
+    public function recordsDelete(string $table, string $idColumn, $idValue)
+    {
         $query = "DELETE FROM $table WHERE $idColumn = ?;";
         $this->query($query, [$idValue]);
     }
 
-    public function recordsEdit(string $table, string $idColumn, $idValue, array $attrs) : void {
+    public function recordsEdit(string $table, string $idColumn, $idValue, array $attrs)
+    {
         $columnsTemp = "";
         foreach ($attrs as $column => $value) {
-        	$columnsTemp .= ",$column=?"; $values[] = $value;
+        	$columnsTemp .= ",$column=?";
+            $values[] = $value;
         }
         $values[] = $idValue;
         $columnsTemp = trim($columnsTemp, ",");
@@ -64,8 +76,10 @@ class Database {
         $this->query($query, $values);
     }
 
-    public function recordsGet(string $table, string $idColumn, $idValue) : array {
+    public function recordsGet(string $table, string $idColumn, $idValue): array
+    {
         $query = "SELECT * FROM $table WHERE $idColumn = ?;";
+
         return $this->query($query, [$idValue]);
     }
 }
