@@ -15,6 +15,6 @@ Route::setRoute("/some/{}/path/{}/here", function(string $arg1, string $arg2) {
     Controller::view("home.index", ["arg1" => $arg1, "arg2" => $arg2]);
 });
 
-Route::setRoute("/some/cool/path", function() : void {
+Route::setRoute("/some/cool/path", function() {
     echo "hello there";
 });
