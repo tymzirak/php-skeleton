@@ -9,7 +9,7 @@ class Route
     private string $action;
     private array $params;
 
-    static private array $resources = [];
+    private static array $resources = [];
 
     public function __construct()
     {
@@ -84,7 +84,7 @@ class Route
         return false;
     }
 
-    static public function setRoute(string $route, $action)
+    public static function setRoute(string $route, $action)
     {
         self::$resources[trim($route, "/")] = $action;
     }
