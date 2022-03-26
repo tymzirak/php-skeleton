@@ -6,7 +6,7 @@ class Route
 {
     private string $namespace = "App\Controllers\\";
     private object|string $controller;
-    private string $action;
+    private $action;
     private array $params;
 
     private static array $resources = [];
@@ -20,10 +20,10 @@ class Route
     {
         $url = empty($_GET["url"]) ? "" : trim($_GET["url"], "/");
 
-        foreach (self::$resources as $route => $action) {
+        foreach (self::$resources as $route => $options) {
             if ($this->validateRoute($url, $route)) {
                 $params = $this->getRouteParams($url, $route);
-                if ($this->execRoute($action, $params)) {
+                if ($this->execRoute($options["action"], $params, $options["request_method"])) {
                     return;
                 }
             }
@@ -53,8 +53,12 @@ class Route
         return $params;
     }
 
-    private function execRoute($action, array $params): bool
+    private function execRoute($action, array $params, string $requestMethod): bool
     {
+        if ($_SERVER["REQUEST_METHOD"] != strtoupper($requestMethod)) {
+            return false;
+        }
+
         if (gettype($action) == "string") {
             $actionPieces = explode("@", $action);
 
@@ -63,9 +67,9 @@ class Route
             $this->params = $params;
 
             return $this->execController();
-        } else {
-            $action(...$params);
         }
+
+        $action(...$params);
 
         return true;
     }
@@ -84,8 +88,11 @@ class Route
         return false;
     }
 
-    public static function setRoute(string $route, $action)
+    public static function setRoute(string $route, $action, string $requestMethod="GET")
     {
-        self::$resources[trim($route, "/")] = $action;
+        self::$resources[trim($route, "/")] = [
+            "action" => $action,
+            "request_method" => $requestMethod
+        ];
     }
 }
