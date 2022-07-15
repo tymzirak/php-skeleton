@@ -4,7 +4,7 @@ namespace App\Core;
 
 class Route
 {
-    private string $namespace = "App\Controllers\\";
+    private string $namespace = "App\Controller\\";
     private object|string $controller;
     private $action;
     private array $params;
