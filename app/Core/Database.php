@@ -8,6 +8,7 @@ class Database
     private string $dbName = "skeleton";
     private string $username = "username";
     private string $password = "password";
+    private string $dbms = "mysql";
 
     private \PDO $connection;
 
@@ -20,7 +21,7 @@ class Database
     {
         try {
             $this->connection = new \PDO(
-                "mysql:host=".$this->host.";dbname=".$this->dbName,
+                $this->dbms.":host=".$this->host.";dbname=".$this->dbName,
                 $this->username,
                 $this->password
             );
