@@ -17,8 +17,9 @@
 - Change the values according to your database settings, in the **/app/Core/Database.php** file.
 
 ```
-private string $dbName = "skeleton";
 private string $username = "username";
 private string $password = "password";
 private string $dbms = "mysql";
 ```
+
+> Run the SQL code in the **/inc/database/temp.sql** file to initialize the database.
