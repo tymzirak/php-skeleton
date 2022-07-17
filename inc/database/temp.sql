@@ -1,0 +1,9 @@
+DROP DATABASE IF EXISTS skeleton;
+CREATE DATABASE skeleton;
+USE skeleton;
+
+CREATE TABLE some_table (
+    x VARCHAR(1) NOT NULL,
+    y VARCHAR(1) NOT NULL,
+    z VARCHAR(1) NOT NULL
+);
